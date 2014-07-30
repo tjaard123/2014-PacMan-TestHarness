@@ -9,6 +9,8 @@ namespace PacManDuel.Models
 {
     class Player
     {
+        private static String LOCK_FILE_ACCESS = "This variable is used to lock on to ensure only one thread writes to a file.";
+
         private readonly String _playerName;
         private readonly String _workingPath;
         private readonly String _executableFileName;
@@ -59,9 +61,12 @@ namespace PacManDuel.Models
             System.Diagnostics.DataReceivedEventHandler h = (sender, args) => {
                 if (!String.IsNullOrEmpty(args.Data)) 
                 {
-                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(_workingPath + System.IO.Path.DirectorySeparatorChar + "botlogs_capture.txt", true))
+                    lock (LOCK_FILE_ACCESS)
                     {
-                        file.WriteLine(args.Data);
+                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(_workingPath + System.IO.Path.DirectorySeparatorChar + "botlogs_capture.txt", true))
+                        {
+                            file.WriteLine(args.Data);
+                        }
                     }
                 }
             };
